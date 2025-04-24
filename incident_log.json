@@ -2,16 +2,11 @@
     {
         "issue": "Error when login",
         "resolution": "Cleared Cache",
-        "system": "Office"
+        "system": "Office 365"
     },
     {
-        "issue": "Email not working",
-        "resolution": "Removed old CAC Cert and downloaded new.",
-        "system": "Phone"
-    },
-    {
-        "issue": "Not powering on",
-        "resolution": "Missing battery, replaced.",
-        "system": "Laptop"
+        "issue": "Not receiving power when plugged in.",
+        "resolution": "Replaced battery.",
+        "system": "Dell 5550 Laptop"
     }
 ]
