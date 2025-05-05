@@ -104,7 +104,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\KGIBS\source\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KGIBS\source\json-develop\include;C:\Users\Circu\source\json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
+      <AdditionalHeaderUnitDependencies>
+      </AdditionalHeaderUnitDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
