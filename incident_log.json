@@ -2,7 +2,15 @@
     {
         "issue": "User receives error when attempting to login to local application",
         "resolution": "Helpdesk ticket #000000123 issued to resolve user issue regarding wrong IDCO information.",
+        "status": "Open",
         "system": "Outlook",
-        "timestamp": "2025-05-06 10:06:19"
+        "timestamp": "2025-05-06 11:57:28"
+    },
+    {
+        "issue": "Missing Email",
+        "resolution": "Updated iOS and waited for check-in.",
+        "status": "Resolved",
+        "system": "Govt Phone",
+        "timestamp": "2025-05-06 11:35:52"
     }
 ]
