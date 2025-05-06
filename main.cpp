@@ -15,7 +15,20 @@ public:
 	string issue;
 	string resolution;
 	string timestamp;
+	string status;
 };
+
+// Status validation - Helper function
+const vector<string> validStatuses = { "Open", "In Progress", "Resolved", "Escalated"};
+
+bool isValidStatus(const string& status) {
+	for (const auto& s : validStatuses) {
+		if (s == status) {
+			return true;
+		}
+	}
+	return false;
+}
 
 // JSON serialization
 void to_json(json& j, const Incident& i) {
@@ -23,7 +36,8 @@ void to_json(json& j, const Incident& i) {
 			{"system", i.system}, 
 			{"issue", i.issue}, 
 			{"resolution", i.resolution}, 
-			{"timestamp", i.timestamp} 
+			{"timestamp", i.timestamp},
+			{ "status", i.status}
 	};
 }
 
@@ -33,6 +47,13 @@ void from_json(const json& j, Incident& i) {
 	j.at("issue").get_to(i.issue);
 	j.at("resolution").get_to(i.resolution);
 	j.at("timestamp").get_to(i.timestamp);
+
+	if (j.contains("status")) {
+		j.at("status").get_to(i.status);
+	}
+	else {
+		i.status = "Open"; // Default value if not present
+	}
 }
 
 // Current time function
@@ -58,6 +79,24 @@ void logIncident() {
 
 	cout << "How was it resolved? ";
 	getline(cin, incident.resolution);
+
+	// Status input with validation
+	do {
+		cout << "Enter Status (Open, In Progress, Resolved, Escalated): ";
+		getline(cin, incident.status);
+
+		if (incident.status.empty()) {
+			incident.status = "Open"; // Default value
+		}
+
+		if (!isValidStatus(incident.status)) {
+			cout << "Invalid status. Please enter a valid status.\n";
+			for (const auto& s : validStatuses) {
+				cout << s << " ";
+				cout << endl;
+			}
+		}
+	} while (!isValidStatus(incident.status));
 
 	// TimeStamp
 	incident.timestamp = getCurrentTime();
@@ -99,6 +138,7 @@ void viewIncidents() {
 		cout << "System: " << i.system << endl;
 		cout << "Issue: " << i.issue << endl;
 		cout << "Resolution: " << i.resolution << endl;
+		cout << "Status: " << i.status << endl;
 		cout << "Timestamp: " << i.timestamp << endl;
 		cout << "---\n";
 	}
@@ -179,6 +219,17 @@ void updateIncident() {
 	getline(cin, userInput);
 	if (!userInput.empty()) incident.resolution = userInput;
 
+	cout << "Current status: " << incident.status << "\nNew status (leave blank to keep)\n[Open, In Progress, Resolved, Escalated]: ";
+	getline(cin, userInput);
+	if (!userInput.empty()) {
+		if (isValidStatus(userInput)) {
+			incident.status = userInput;
+		}
+		else {
+			cout << "Invalid status. Keeping exsisting status.\n";
+		}
+	}
+
 	// Timestamp of modification
 	incident.timestamp = getCurrentTime();
 
@@ -240,6 +291,35 @@ void deleteIncident() {
 	}
 }
 
+// Filter by Status
+void filterByStatus() {
+	string query;
+	cout << "Enter status to filter by (Open, In Progress, Resolved, Escalated): ";
+	getline(cin, query);
+
+	if (!isValidStatus(query)) {
+		cout << "Invalid status. Please enter a valid status.\n";
+		return;
+	}
+
+	ifstream input("incident_log.json");
+	json jList;
+	input >> jList;
+	input.close();
+
+	cout << "\n--- Incidents with status \"" << query << "\" ---\n";
+	for (const auto& item : jList) {
+		Incident i = item;
+		if (i.status == query) {
+			cout << "System: " << i.system << endl;
+			cout << "Issue: " << i.issue << endl;
+			cout << "Resolution: " << i.resolution << endl;
+			cout << "Timestamp: " << i.timestamp << endl;
+			cout << "---\n";
+		}
+	}
+}
+
 // Main menu
 int main() {
 	int choice;
@@ -251,7 +331,8 @@ int main() {
 		cout << "3. Search incidents by keyword\n";
 		cout << "4. Update incident\n";
 		cout << "5. Delete incident\n";
-		cout << "6. Exit\n";
+		cout << "6. Filter incidents by status\n";
+		cout << "7. Exit\n";
 		cout << "Choose an option: ";
 
 		cin >> choice;
@@ -274,6 +355,9 @@ int main() {
 			deleteIncident();
 			break;
 		case 6:
+			filterByStatus();
+			break;
+		case 7:
 			cout << "Exiting program. Farewell, sys-knight.\n";
 			return 0;
 		default:
