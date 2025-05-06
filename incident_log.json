@@ -1,12 +1,8 @@
 [
     {
-        "issue": "Error when login",
-        "resolution": "Cleared Cache",
-        "system": "Office 365"
-    },
-    {
-        "issue": "Not receiving power when plugged in.",
-        "resolution": "Replaced battery.",
-        "system": "Dell 5550 Laptop"
+        "issue": "User receives error when attempting to login to local application",
+        "resolution": "Helpdesk ticket #000000123 issued to resolve user issue regarding wrong IDCO information.",
+        "system": "Outlook",
+        "timestamp": "2025-05-06 10:06:19"
     }
 ]
