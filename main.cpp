@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <limits> // <-- Needed for numeric_limits
+#include <ctime> // <-- Used for timestamps
 #include <nlohmann/json.hpp>
 
 using namespace std;
@@ -13,11 +14,17 @@ public:
 	string system;
 	string issue;
 	string resolution;
+	string timestamp;
 };
 
 // JSON serialization
 void to_json(json& j, const Incident& i) {
-	j = json{ {"system", i.system}, {"issue", i.issue}, {"resolution", i.resolution} };
+	j = json{ 
+			{"system", i.system}, 
+			{"issue", i.issue}, 
+			{"resolution", i.resolution}, 
+			{"timestamp", i.timestamp} 
+	};
 }
 
 // JSON deserialization
@@ -25,6 +32,18 @@ void from_json(const json& j, Incident& i) {
 	j.at("system").get_to(i.system);
 	j.at("issue").get_to(i.issue);
 	j.at("resolution").get_to(i.resolution);
+	j.at("timestamp").get_to(i.timestamp);
+}
+
+// Current time function
+string getCurrentTime() {
+	time_t now = time(0);
+	tm timeStruct;
+	localtime_s(&timeStruct, &now); // Use localtime_s for thread safety
+
+	char buf[80];
+	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &timeStruct);
+	return string(buf);
 }
 
 // Log a new incident
@@ -39,6 +58,9 @@ void logIncident() {
 
 	cout << "How was it resolved? ";
 	getline(cin, incident.resolution);
+
+	// TimeStamp
+	incident.timestamp = getCurrentTime();
 
 	// Load existing JSON
 	ifstream input("incident_log.json");
@@ -77,6 +99,7 @@ void viewIncidents() {
 		cout << "System: " << i.system << endl;
 		cout << "Issue: " << i.issue << endl;
 		cout << "Resolution: " << i.resolution << endl;
+		cout << "Timestamp: " << i.timestamp << endl;
 		cout << "---\n";
 	}
 }
@@ -155,6 +178,9 @@ void updateIncident() {
 	cout << "Current resolution: " << incident.resolution << "\nNew resolution (leave blank to keep): ";
 	getline(cin, userInput);
 	if (!userInput.empty()) incident.resolution = userInput;
+
+	// Timestamp of modification
+	incident.timestamp = getCurrentTime();
 
 	// Reassign the updated object back to JSON
 	jList[index] = incident; // trigger from_json()
