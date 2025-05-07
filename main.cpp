@@ -12,11 +12,36 @@ using json = nlohmann::json;
 class Incident {
 public:
 	string system;
+	string catagory;
 	string issue;
 	string resolution;
 	string timestamp;
 	string status;
 };
+
+// Status validation - Helper function
+const vector<string> validStatuses = { "Open", "In Progress", "Resolved", "Escalated"};
+
+bool isValidStatus(const string& status) {
+	for (const auto& s : validStatuses) {
+		if (s == status) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// Catagory validation - Helper function
+const vector<string> validCatagories = { "Hardware", "Software", "Network", "Security", "User Error", "Configuration", "Other" };
+
+bool isValidCatagory(const string& catagory) {
+	for (const auto& c : validCatagories) {
+		if (c == catagory) {
+			return true;
+		}
+	}
+	return false;
+}
 
 // JSON serialization
 void to_json(json& j, const Incident& i) {
@@ -25,9 +50,9 @@ void to_json(json& j, const Incident& i) {
 			{"issue", i.issue}, 
 			{"resolution", i.resolution}, 
 			{"timestamp", i.timestamp},
-			{ "status", i.status}
+			{ "status", i.status},
+			{"catagory", i.catagory}
 	};
-	j = json{ {"system", i.system}, {"issue", i.issue}, {"resolution", i.resolution} };
 }
 
 // JSON deserialization
@@ -43,8 +68,13 @@ void from_json(const json& j, Incident& i) {
 	else {
 		i.status = "Open"; // Default value if not present
 	}
-}
 
+	if (j.contains("catagory")) {
+		j.at("catagory").get_to(i.catagory);
+	}
+	else {
+		i.catagory = "Other"; // Default value if not present
+	}
 }
 
 // Current time function
@@ -67,6 +97,24 @@ void logIncident() {
 
 	cout << "Describe the issue: ";
 	getline(cin, incident.issue);
+
+	// Catagory input with validation
+	do {
+		cout << "Enter Catagory (Hardware, Software, Network, Security, User Error, Configuration, Other): ";
+		getline(cin, incident.catagory);
+
+		if (incident.catagory.empty()) {
+			incident.catagory = "Other"; // Default value
+		}
+
+		if (!isValidCatagory(incident.catagory)) {
+			cout << "Invalid catagory. Please enter a valid catagory.\n";
+			for (const auto& c : validCatagories) {
+				cout << c << " ";
+				cout << endl;
+			}
+		}
+	} while (!isValidCatagory(incident.catagory));
 
 	cout << "How was it resolved? ";
 	getline(cin, incident.resolution);
@@ -128,6 +176,7 @@ void viewIncidents() {
 		Incident i = item;
 		cout << "System: " << i.system << endl;
 		cout << "Issue: " << i.issue << endl;
+		cout << "Catagory: " << i.catagory << endl;
 		cout << "Resolution: " << i.resolution << endl;
 		cout << "Status: " << i.status << endl;
 		cout << "Timestamp: " << i.timestamp << endl;
@@ -160,7 +209,10 @@ void searchIncidents() {
 			i.resolution.find(keyword) != string::npos) {
 			cout << "System: " << i.system << endl;
 			cout << "Issue: " << i.issue << endl;
+			cout << "Catagory: " << i.catagory << endl;
 			cout << "Resolution: " << i.resolution << endl;
+			cout << "Status: " << i.status << endl;
+			cout << "Timestamp: " << i.timestamp << endl;
 			cout << "---\n";
 			found = true;
 		}
@@ -205,6 +257,17 @@ void updateIncident() {
 	cout << "Current issue: " << incident.issue << "\nNew issue (leave blank to keep): ";
 	getline(cin, userInput);
 	if (!userInput.empty()) incident.issue = userInput;
+
+	cout << "Current catagory: " << incident.catagory << "\nNew catagory (leave blank to keep)\n[Hardware, Software, Network, Security, User Error, Configuration, Other]: ";
+	getline(cin, userInput);
+	if (!userInput.empty()) {
+		if (isValidCatagory(userInput)) {
+			incident.catagory = userInput;
+		}
+		else {
+			cout << "Invalid catagory. Keeping exsisting catagory.\n";
+		}
+	}
 
 	cout << "Current resolution: " << incident.resolution << "\nNew resolution (leave blank to keep): ";
 	getline(cin, userInput);
@@ -304,6 +367,7 @@ void filterByStatus() {
 		if (i.status == query) {
 			cout << "System: " << i.system << endl;
 			cout << "Issue: " << i.issue << endl;
+			cout << "Catagory: " << i.catagory << endl;
 			cout << "Resolution: " << i.resolution << endl;
 			cout << "Timestamp: " << i.timestamp << endl;
 			cout << "---\n";
@@ -338,35 +402,6 @@ void filterByCatagory() {
 	}
 }
 
-// Filter by Status
-void filterByStatus() {
-	string query;
-	cout << "Enter status to filter by (Open, In Progress, Resolved, Escalated): ";
-	getline(cin, query);
-
-	if (!isValidStatus(query)) {
-		cout << "Invalid status. Please enter a valid status.\n";
-		return;
-	}
-
-	ifstream input("incident_log.json");
-	json jList;
-	input >> jList;
-	input.close();
-
-	cout << "\n--- Incidents with status \"" << query << "\" ---\n";
-	for (const auto& item : jList) {
-		Incident i = item;
-		if (i.status == query) {
-			cout << "System: " << i.system << endl;
-			cout << "Issue: " << i.issue << endl;
-			cout << "Resolution: " << i.resolution << endl;
-			cout << "Timestamp: " << i.timestamp << endl;
-			cout << "---\n";
-		}
-	}
-}
-
 // Main menu
 int main() {
 	int choice;
@@ -379,8 +414,8 @@ int main() {
 		cout << "4. Update incident\n";
 		cout << "5. Delete incident\n";
 		cout << "6. Filter incidents by status\n";
-		cout << "7. Exit\n";
-		cout << "6. Exit\n";
+		cout << "7. Filter incidents by catagory\n";
+		cout << "8. Exit\n";
 		cout << "Choose an option: ";
 
 		cin >> choice;
@@ -403,6 +438,12 @@ int main() {
 			deleteIncident();
 			break;
 		case 6:
+			filterByStatus();
+			break;
+		case 7:
+			filterByCatagory();
+			break;
+		case 8:
 			cout << "Exiting program. Farewell, sys-knight.\n";
 			return 0;
 		default:
