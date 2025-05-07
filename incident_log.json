@@ -1,34 +1,12 @@
 [
     {
-        "catagory": "Software",
-        "issue": "User receives error when attempting to login to local application",
-        "resolution": "Helpdesk ticket #000000123 issued to resolve user issue regarding wrong IDCO information.",
-        "status": "Open",
-        "system": "Outlook",
-        "timestamp": "2025-05-07 12:38:45"
+        "issue": "Error when login",
+        "resolution": "Cleared Cache",
+        "system": "Office 365"
     },
     {
-        "catagory": "Software",
-        "issue": "Missing Email",
-        "resolution": "Updated iOS and waited for check-in.",
-        "status": "Resolved",
-        "system": "Govt Phone",
-        "timestamp": "2025-05-07 12:39:18"
-    },
-    {
-        "catagory": "User Error",
-        "issue": "Not able to access RZ",
-        "resolution": "Acquired VPN prior to navigation to site.",
-        "status": "Resolved",
-        "system": "RWS",
-        "timestamp": "2025-05-07 12:33:58"
-    },
-    {
-        "catagory": "Other",
-        "issue": "Test5",
-        "resolution": "test4",
-        "status": "Open",
-        "system": "Test4",
-        "timestamp": "2025-05-07 12:35:38"
+        "issue": "Not receiving power when plugged in.",
+        "resolution": "Replaced battery.",
+        "system": "Dell 5550 Laptop"
     }
 ]

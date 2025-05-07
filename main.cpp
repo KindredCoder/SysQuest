@@ -19,40 +19,9 @@ public:
 	string status;
 };
 
-// Status validation - Helper function
-const vector<string> validStatuses = { "Open", "In Progress", "Resolved", "Escalated"};
-
-bool isValidStatus(const string& status) {
-	for (const auto& s : validStatuses) {
-		if (s == status) {
-			return true;
-		}
-	}
-	return false;
-}
-
-// Catagory validation - Helper function
-const vector<string> validCatagories = { "Hardware", "Software", "Network", "Security", "User Error", "Configuration", "Other" };
-
-bool isValidCatagory(const string& catagory) {
-	for (const auto& c : validCatagories) {
-		if (c == catagory) {
-			return true;
-		}
-	}
-	return false;
-}
-
 // JSON serialization
 void to_json(json& j, const Incident& i) {
-	j = json{ 
-			{"system", i.system}, 
-			{"issue", i.issue}, 
-			{"resolution", i.resolution}, 
-			{"timestamp", i.timestamp},
-			{ "status", i.status},
-			{"catagory", i.catagory}
-	};
+	j = json{ {"system", i.system}, {"issue", i.issue}, {"resolution", i.resolution} };
 }
 
 // JSON deserialization
@@ -60,21 +29,6 @@ void from_json(const json& j, Incident& i) {
 	j.at("system").get_to(i.system);
 	j.at("issue").get_to(i.issue);
 	j.at("resolution").get_to(i.resolution);
-	j.at("timestamp").get_to(i.timestamp);
-
-	if (j.contains("status")) {
-		j.at("status").get_to(i.status);
-	}
-	else {
-		i.status = "Open"; // Default value if not present
-	}
-
-	if (j.contains("catagory")) {
-		j.at("catagory").get_to(i.catagory);
-	}
-	else {
-		i.catagory = "Other"; // Default value if not present
-	}
 }
 
 // Current time function
@@ -402,6 +356,35 @@ void filterByCatagory() {
 	}
 }
 
+// Filter by Status
+void filterByStatus() {
+	string query;
+	cout << "Enter status to filter by (Open, In Progress, Resolved, Escalated): ";
+	getline(cin, query);
+
+	if (!isValidStatus(query)) {
+		cout << "Invalid status. Please enter a valid status.\n";
+		return;
+	}
+
+	ifstream input("incident_log.json");
+	json jList;
+	input >> jList;
+	input.close();
+
+	cout << "\n--- Incidents with status \"" << query << "\" ---\n";
+	for (const auto& item : jList) {
+		Incident i = item;
+		if (i.status == query) {
+			cout << "System: " << i.system << endl;
+			cout << "Issue: " << i.issue << endl;
+			cout << "Resolution: " << i.resolution << endl;
+			cout << "Timestamp: " << i.timestamp << endl;
+			cout << "---\n";
+		}
+	}
+}
+
 // Main menu
 int main() {
 	int choice;
@@ -413,9 +396,7 @@ int main() {
 		cout << "3. Search incidents by keyword\n";
 		cout << "4. Update incident\n";
 		cout << "5. Delete incident\n";
-		cout << "6. Filter incidents by status\n";
-		cout << "7. Filter incidents by catagory\n";
-		cout << "8. Exit\n";
+		cout << "6. Exit\n";
 		cout << "Choose an option: ";
 
 		cin >> choice;
@@ -438,12 +419,6 @@ int main() {
 			deleteIncident();
 			break;
 		case 6:
-			filterByStatus();
-			break;
-		case 7:
-			filterByCatagory();
-			break;
-		case 8:
 			cout << "Exiting program. Farewell, sys-knight.\n";
 			return 0;
 		default:
