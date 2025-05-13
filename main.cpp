@@ -1,3 +1,12 @@
+/*
+* Developed by Kyle Gibson - AKA KindredCoder
+* 
+* Source Code is developed to be open sourced and free to share.
+* This project and development is focued on continued learning and development of coding skills
+* 
+* Contact: kyle.gibson2@snhu.edu
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -50,7 +59,7 @@ void to_json(json& j, const Incident& i) {
 			{"issue", i.issue}, 
 			{"resolution", i.resolution}, 
 			{"timestamp", i.timestamp},
-			{ "status", i.status},
+			{"status", i.status},
 			{"catagory", i.catagory}
 	};
 }
