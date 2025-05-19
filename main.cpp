@@ -4,6 +4,7 @@
 * Source Code is developed to be open sourced and free to share.
 * This project and development is focued on continued learning and development of coding skills
 * 
+* 
 * Contact: kyle.gibson2@snhu.edu
 */
 
@@ -411,6 +412,67 @@ void filterByCatagory() {
 	}
 }
 
+// Filter Incidents by multiple options
+void filterIncidents() {
+	string statusInput, catagoryInput;
+
+	cout << "Enter status of filter by (or leave blank): ";
+	getline(cin, statusInput);
+
+	if (!statusInput.empty() && !isValidStatus(statusInput)) {
+		cout << "Invalid status. Available options are: ";
+		for (const auto& s : validStatuses) cout << s << " ";
+		cout << endl;
+		return;
+	}
+
+	cout << "Enter catagory to filter by (or leave blank): ";
+	getline(cin, catagoryInput);
+
+	if (!catagoryInput.empty() && !isValidCatagory(catagoryInput)) {
+		cout << "Invalid catagory. Available options are: ";
+		for (const auto& c : validCatagories) cout << c << " ";
+		cout << endl;
+		return;
+	}
+
+	// Load incidents
+	ifstream input("incident_log.json");
+	if (!input.is_open()) {
+		cerr << "Could not open incident log.\n";
+		return;
+	}
+
+	json jList;
+	input >> jList;
+	input.close();
+
+	cout << "\n--- Filtered Incidents ---\n";
+	bool found = false;
+
+	for (const auto& item : jList) {
+		Incident i = item;
+
+		bool statusMatch = statusInput.empty() || i.status == statusInput;
+		bool catagoryMatch = catagoryInput.empty() || i.catagory == catagoryInput;
+
+		if (statusMatch && catagoryMatch) {
+			cout << "System: " << i.system << endl;
+			cout << "Issue: " << i.issue << endl;
+			cout << "Catagory: " << i.catagory << endl;
+			cout << "Resolution: " << i.resolution << endl;
+			cout << "Status: " << i.status << endl;
+			cout << "Timestamp: " << i.timestamp << endl;
+			cout << "---\n";
+			found = true;
+		}
+	}
+
+	if (!found) {
+		cout << "No incidents found matching the criteria.\n";
+	}
+}
+
 // Main menu
 int main() {
 	int choice;
@@ -424,7 +486,8 @@ int main() {
 		cout << "5. Delete incident\n";
 		cout << "6. Filter incidents by status\n";
 		cout << "7. Filter incidents by catagory\n";
-		cout << "8. Exit\n";
+		cout << "8. Filter incidents by multiple options\n";
+		cout << "9. Exit\n";
 		cout << "Choose an option: ";
 
 		cin >> choice;
@@ -453,6 +516,9 @@ int main() {
 			filterByCatagory();
 			break;
 		case 8:
+			filterIncidents();
+			break;
+		case 9:
 			cout << "Exiting program. Farewell, sys-knight.\n";
 			return 0;
 		default:
