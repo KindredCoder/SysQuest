@@ -412,6 +412,31 @@ void filterByCatagory() {
 	}
 }
 
+// Exporting to CSV
+void exportToCSV(const vector<Incident>& results, const string& filename = "filtered_incidents.csv") {
+	ofstream file(filename);
+	if (!file.is_open()) {
+		cerr << "Could not open file for writing.\n";
+		return;
+	}
+
+	// Write CSV header
+	file << "System,Issue,Catagory,Resolution,Status,Timestamp\n";
+
+	// Write each incident
+	for (const auto& i : results) {
+		file << '"' << i.system << "\",\""
+			<< i.issue << "\",\""
+			<< i.catagory << "\",\""
+			<< i.resolution << "\",\""
+			<< i.status << "\",\""
+			<< i.timestamp << "\"\n";
+	}
+
+	file.close();
+	cout << "Filtered incidents exported to " << filename << " successfully!\n";
+}
+
 // Filter Incidents by multiple options
 void filterIncidents() {
 	string statusInput, catagoryInput;
@@ -450,6 +475,8 @@ void filterIncidents() {
 	cout << "\n--- Filtered Incidents ---\n";
 	bool found = false;
 
+	vector<Incident> filteredResults;
+
 	for (const auto& item : jList) {
 		Incident i = item;
 
@@ -457,6 +484,7 @@ void filterIncidents() {
 		bool catagoryMatch = catagoryInput.empty() || i.catagory == catagoryInput;
 
 		if (statusMatch && catagoryMatch) {
+			// Display
 			cout << "System: " << i.system << endl;
 			cout << "Issue: " << i.issue << endl;
 			cout << "Catagory: " << i.catagory << endl;
@@ -464,14 +492,25 @@ void filterIncidents() {
 			cout << "Status: " << i.status << endl;
 			cout << "Timestamp: " << i.timestamp << endl;
 			cout << "---\n";
-			found = true;
+			
+
+			// Store for CSV export
+			filteredResults.push_back(i);
 		}
 	}
 
-	if (!found) {
+	if (filteredResults.empty()) {
 		cout << "No incidents found matching the criteria.\n";
+	} else {
+		string choice;
+		cout << "Would you like to export these to CSV? (y/n): ";
+		getline(cin, choice);
+		if (choice == "y" || choice == "Y") {
+			exportToCSV(filteredResults);
+		}	
 	}
 }
+
 
 // Main menu
 int main() {

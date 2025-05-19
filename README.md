@@ -16,5 +16,4 @@ This project aims to demonstrate and understand JSON Data flows and how to utili
 ## Additional items and features to come:
 
    - [ ] GUI user interface
-   - [X] Incident Catagories _Completed_ (07/May/2025)
    - [ ] Analytics to capture quantifiables
